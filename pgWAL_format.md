@@ -1,4 +1,5 @@
 # structure of wal
+
 # 1. WAL page struct
 
 ```C
@@ -28,7 +29,7 @@ typedef XLogPageHeaderData *XLogPageHeader;
  * XLOG file.)	The additional fields serve to identify the file accurately.
  * wal 
  */
-typedef struct XLogLongPageHeaderData //for the first page of the first segment
+typedef struct XLogLongPageHeaderData // for the first page of the first segment
 {
 	XLogPageHeaderData std;		/* standard header fields */ 
 	uint64		xlp_sysid;		/* system identifier from pg_control 记录产生 segment 的数据库集簇的 id*/
@@ -242,3 +243,4 @@ main data 部分保存非 buff 性的数据，通过 XLogRegisterData () 函数�
 
 # wal write
 
+```
