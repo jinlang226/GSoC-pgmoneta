@@ -30,8 +30,15 @@ Currently, it uses pg_receivewal to stream the write-ahead log from a running Po
 
 * Also, pg_receivewal does not acknowledge reply, so I will try to fix this with the native solution.
 
+* You have to make a clean-room implementation so you will depend on code only in our repository.
+
+* After the call to pgmoneta_server_authenticate you will have an authenticated socket connection to PostgreSQL. Using that socket you can then create messages (message.h|c) and communicate with the server. So, you need to figure out which messages that you need and how that translate into a similar functionality that we have using pg_receiverwal now.
+
 
 **Jul 4 - Jul 8**
+Hi jesper,
+
+
 - [ ] Come up with a feasible design of replace usage of pg_receivewal inside pgmoneta with a pgmoneta native solution
 - [ ] Discuss with mentor
 
@@ -66,3 +73,66 @@ Currently, it uses pg_receivewal to stream the write-ahead log from a running Po
 
 **Nov 7 - Nov 11**
 - [ ] Submit final project and write summary
+
+
+
+
+# make
+
+git clone https://github.com/pgmoneta/pgmoneta.git
+cd pgmoneta
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+make
+
+# get started
+
+
+/home/pgmoneta/pgmoneta/build/src/pgmoneta-admin master-key
+
+/home/pgmoneta/pgmoneta/build/src/pgmoneta-admin -f /home/pgmoneta/config/pgmoneta_users.conf -U repl -P secretpassword add-user
+
+
+/home/pgmoneta/pgmoneta/build/src/pgmoneta -c /home/pgmoneta/config/pgmoneta.conf -u /home/pgmoneta/config/pgmoneta_users.conf
+
+
+// /home/pgmoneta/pgmoneta/build/src/pgmoneta-cli -c /home/pgmoneta/config/pgmoneta.conf backup primary
+
+# View backup
+/home/pgmoneta/pgmoneta/build/src/pgmoneta-cli -c /home/pgmoneta/config/pgmoneta.conf details
+
+lsof -i:5432
+kill -9 96572
+
+
+/usr/pgsql-14/bin/pg_ctl -D /tmp/pgsql/ start
+
+psql -h localhost -p 5432 -U myuser mydb
+
+DROP TABLE t_test;
+
+
+
+CREATE TABLE t_test(
+    ID INT PRIMARY KEY NOT NULL,
+    NAME TEXT NOT NULL,
+    AGE INT NOT NULL,
+    ADDRESS CHAR(59),
+    SALARY REAL
+);
+
+
+insert into t_test SELECT generate_series(1,500000)
+as key,repeat( chr(int4(random()*26)+65),4), (random()*(6^2))::integer,null,(random()*(10^4))::integer;
+
+\q
+
+cd /tmp/
+
+pgmoneta -c /home/pgmoneta/config/pgmoneta.conf -u /home/pgmoneta/config/pgmoneta_users.conf
+
+
+ls /home/pgmoneta/backup/primary/wal/
+
+CMD: PGPASSWORD="secretpassword" /usr/pgsql-14/bin//pg_receivewal -h localhost -p 5432 -U repl --no-loop --no-password -D /home/kk/GSoC/upload/pgmoneta-plus/backup/primary/wal/
